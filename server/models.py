@@ -1,17 +1,11 @@
 from sqlalchemy_serializer import SerializerMixin
-from config import db
-from flask_sqlalchemy import SQLAlchemy;
-from sqlalchemy.orm import relationship
-from sqlalchemy_serializer import SerializerMixin;
 from datetime import datetime
-from config import db, metadata
 
-
-db = SQLAlchemy(metadata=metadata)
+from config import db
 
 
 class User(db.Model, SerializerMixin):
-    __tablename__ ='users'
+    __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False)
@@ -31,8 +25,8 @@ class Clinic(db.Model):
     city = db.Column(db.String, nullable=False)
     zip_code = db.Column(db.Integer, nullable=False)
 
-    providers = relationship('Provider', back_populates='clinics')
-    patients = relationship('Patient', secondary='patient_clinics', back_populates='clinics')
+    providers = db.relationship('Provider', back_populates='clinics')
+    patients = db.relationship('Patient', secondary='patient_clinics', back_populates='clinics')
 
 class Provider(db.Model, SerializerMixin):
     __tablename__ = 'providers'
@@ -43,10 +37,10 @@ class Provider(db.Model, SerializerMixin):
     provider_type = db.Column(db.String, nullable=False)
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'))
 
-    clinic = relationship('Clinic', back_populates='providers')
-    appointments = relationship('Appointment', back_populates='provider')
+    clinics = db.relationship('Clinic', back_populates='providers')
+    appointments = db.relationship('Appointment', back_populates='provider')
 
-    serialize_rules = ('-clinic',)
+    serialize_rules = ('-clinics',)
 
 class Appointment(db.Model, SerializerMixin):
     __tablename__ = 'appointments'
@@ -57,10 +51,10 @@ class Appointment(db.Model, SerializerMixin):
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     provider_id = db.Column(db.Integer, db.ForeignKey('providers.id'))
 
-    patient = relationship('Patient', back_populates='appointments')
-    provider = relationship('Provider')
+    patients = db.relationship('Patient', back_populates='appointments')
+    provider = db.relationship('Provider')
 
-    serialize_rules = ('-patient.DL_image',)
+    serialize_rules = ('-patients.DL_image',)
 
 class Patient(db.Model):
     __tablename__ = 'patients'
@@ -73,8 +67,9 @@ class Patient(db.Model):
     DL_image = db.Column(db.LargeBinary)
     rx = db.Column(db.String)
 
-    appointments = relationship('Appointment', back_populates='patient')
-    clinics = relationship('Clinic', secondary='patient_clinics',back_populates='patients')
+    appointments = db.relationship('Appointment', back_populates='patients')
+    clinics = db.relationship('Clinic', secondary='patient_clinics', back_populates='patients')
+    signatures = db.relationship('FormSignature', back_populates='patients')
 
 class Form(db.Model):
     __tablename__ = 'forms'
@@ -83,9 +78,9 @@ class Form(db.Model):
     name = db.Column(db.String, nullable=False)
     document_type = db.Column(db.String)
 
-    signature = relationship('FormSignature', back_populates='forms')
+    signatures = db.relationship('FormSignature', back_populates='forms')
 
-class PatientClinc(db.Model):
+class PatientClinic(db.Model):
     __tablename__ = 'patient_clinics'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -96,7 +91,7 @@ class PatientForm(db.Model):
     __tablename__ = 'patient_forms'
 
     id = db.Column(db.Integer, primary_key=True)
-    patient_id= db.Column(db.Integer, db.ForeignKey('patients.id'))
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     form_id = db.Column(db.Integer, db.ForeignKey('forms.id'))
 
 class FormSignature(db.Model):
@@ -109,10 +104,10 @@ class FormSignature(db.Model):
     signature_id = db.Column(db.String)
     signed_status = db.Column(db.String)
 
-    form = relationship('Form', back_populates='signatures')
-    patient = relationship('Patient', back_populates='signatures')
+    forms = db.relationship('Form', back_populates='signatures')
+    patients = db.relationship('Patient', back_populates='signatures')
 
-    serialize_rules = ('-form', '-patient')
+    serialize_rules = ('-forms', '-patients')
 
 class DocumentFile(db.Model):
     __tablename__ = 'document_files'
