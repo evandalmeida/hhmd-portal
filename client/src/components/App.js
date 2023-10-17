@@ -1,8 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { Switch, Route } from "react-router-dom";
+import React from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Login from './Main/Login';
+import PatientRegistration from './Main/PatientRegistration';
+import ClinicRegistration from './Main/ClinicRegistration';
 
-function App() {
-  return <h1>Project Client</h1>;
-}
+const App = () => {
+  return (
+    <Router>
+      <div>
+        <Switch>
+          <Route path="/login" component={Login} />
+          <Route path="/patient-registration" component={PatientRegistration} />
+          <Route path="/clinic-registration" component={ClinicRegistration} />
+        </Switch>
+      </div>
+    </Router>
+  );
+};
 
 export default App;

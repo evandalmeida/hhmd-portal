@@ -1,140 +1,135 @@
-from sqlalchemy.exc import IntegrityError
-from faker import Faker 
-from config import db
-from models import User, Clinic, Provider, Appointment, Patient, Form, PatientClinic, PatientForm, FormSignature, DocumentFile
+# Import the necessary modules and classes
+from config import db, app
+from models import User, Clinic, Provider, Appointment, Patient, PatientClinic
+from faker import Faker
+from datetime import datetime, time, timedelta
+import random
 
-fake = Faker()
+# Create a Faker instance
+faker = Faker()
 
-num_users = 10
-num_clinics = 5
-num_providers = 20 
-num_patients = 50
-num_forms = 10
-num_appointments = 100
-
-def main():
-
-  db.drop_all()
-  db.create_all()
-
-  # Create users
-  users = []
-  for _ in range(num_users):
-    user = User(
-      username=fake.user_name(),
-      password_hash=fake.password(),
-      role=fake.random_element(elements=["admin", "doctor", "patient"]),
-      email=fake.email() 
-    )
-    users.append(user)
-
-  try:
-    db.session.add_all(users)
-    db.session.commit()
-  except IntegrityError:
-    db.session.rollback()
-
-  # Create clinics
-  clinics = []
-  for _ in range(num_clinics):
-    clinic = Clinic(
-      name=fake.company(),
-      address=fake.address(),
-      city=fake.city(),
-      zip_code=fake.zipcode()
-    )
-    clinics.append(clinic)
-
-  try:
-    db.session.add_all(clinics)
-    db.session.commit()
-  except IntegrityError:
-    db.session.rollback()
-
-  # Create providers
-  providers = []
-  for _ in range(num_providers):
-    provider = Provider(
-      first_name=fake.first_name(),
-      last_name=fake.last_name(),
-      provider_type=fake.random_element(elements=["GP", "Dentist", "Surgeon"]), 
-      clinic_id=fake.random_element(elements=clinics).id  
-    )
-    providers.append(provider)
-
-  try:
-    db.session.add_all(providers)
-    db.session.commit() 
-  except IntegrityError:
-    db.session.rollback()
-
-  # Create patients
-  patients = []
-  for _ in range(num_patients):
-    patient = Patient(
-      first_name=fake.first_name(),
-      last_name=fake.last_name(),
-      dob=fake.date_of_birth(minimum_age=18, maximum_age=80),
-      address=fake.address(),
-      DL_image=None,
-      rx=fake.sentence() 
-    )
-    patients.append(patient)
-
-  try:
-    db.session.add_all(patients)
-    db.session.commit()
-  except IntegrityError: 
-    db.session.rollback()
-
-  # Create forms
-  forms = []
-  for _ in range(num_forms):
-    form = Form(
-      name=fake.word(),
-      document_type=fake.random_element(elements=["Medical", "Dental", "Surgical"])
-    )
-    forms.append(form)
-
-  try:
-    db.session.add_all(forms)
-    db.session.commit()
-  except IntegrityError:
-    db.session.rollback()
-
-  # Add relationships
-  for patient in patients:
-    # Assign clinics
-    num_clinics = fake.random_int(min=1, max=len(clinics)) 
-    patient_clinics = random.sample(clinics, num_clinics)
-    for clinic in patient_clinics:
-      db.session.add(PatientClinic(
-        patient_id=patient.id,
-        clinic_id=clinic.id  
-      ))
-
-    # Assign forms 
-    num_forms = fake.random_int(min=1, max=len(forms))
-    patient_forms = random.sample(forms, num_forms)
-    for form in patient_forms:
-      db.session.add(PatientForm(
-        patient_id=patient.id,
-        form_id=form.id
-      ))
-
-  for provider in providers:
-    # Assign clinic
-    provider.clinic_id = fake.random_element(elements=clinics).id
-
-  for appointment in appointments: 
-    # Assign patient and provider
-    appointment.patient_id = fake.random_element(elements=patients).id
-    appointment.provider_id = fake.random_element(elements=providers).id
-
-  try:
-    db.session.commit()
-  except IntegrityError: 
-    db.session.rollback()
+# Function to generate a random time between 9am and 5pm
+def generate_weekday_time():
+    return time(random.randint(9, 16), random.randint(0, 59), random.randint(0, 59))
 
 if __name__ == '__main__':
-  main()
+    with app.app_context():
+        print("Seeding database...")
+        print("Deleting old data...")
+
+        db.drop_all()
+        db.create_all()
+
+        print("Seeding users...")
+
+        users_list = []
+
+        for _ in range(5):
+            role = random.choice(["clinic", "patient"])
+            first_name = faker.first_name()
+            last_name = faker.last_name()
+            user = User(
+                username=f"{first_name} {last_name}",
+                password_hash=faker.password(),
+                role=role,
+                email=faker.email(),
+            )
+            users_list.append(user)
+
+        db.session.add_all(users_list)
+        db.session.commit()
+
+        print("Seeding clinics...")
+
+        clinics_list = []
+
+        for _ in range(5):
+            clinic = Clinic(
+                name=faker.company(),
+                address=faker.street_address(),
+                state=faker.state_abbr(),  # Add state information
+                zip_code=faker.zipcode(),  # Add ZIP+4 codes as strings
+            )
+            clinics_list.append(clinic)
+
+        db.session.add_all(clinics_list)
+        db.session.commit()
+
+        print("Seeding providers...")
+
+        providers_list = []
+
+        for _ in range(10):
+            provider_type = random.choice(["NP", "DO", "MD", "PA"])
+            first_name = faker.first_name()
+            last_name = faker.last_name()
+
+            provider = Provider(
+                first_name=first_name,
+                last_name=last_name,
+                provider_type=provider_type,
+                clinic_id=random.choice(clinics_list).id
+            )
+            providers_list.append(provider)
+
+        db.session.add_all(providers_list)
+        db.session.commit()
+
+        print("Seeding patients...")
+
+        patients_list = []
+
+        for _ in range(10):
+            first_name = faker.first_name()
+            last_name = faker.last_name()
+            dob = faker.date_of_birth(tzinfo=None, minimum_age=18, maximum_age=90)
+            street_address = faker.street_address()
+            zip_code = faker.zipcode()  # Add ZIP+4 codes as strings
+            state = faker.state_abbr()  # Add state abbreviations
+            user = random.choice(users_list)
+
+            patient = Patient(
+                first_name=first_name,
+                last_name=last_name,
+                dob=dob,
+                street_address=street_address,  # Update the address field name
+                state=state,  # Assign state abbreviations
+                zip_code=zip_code,  # Assign ZIP codes
+                user=user,
+            )
+            patients_list.append(patient)
+
+        db.session.add_all(patients_list)
+        db.session.commit()
+
+        print("Seeding patient-clinics...")
+
+        patient_clinics_list = []
+
+        for patient in patients_list:
+            for _ in range(random.randint(1, 3)):
+                clinic = random.choice(clinics_list)
+                if clinic.id not in [pc.clinic_id for pc in patient_clinics_list]:
+                    patient_clinic = PatientClinic(patient_id=patient.id, clinic_id=clinic.id)
+                    patient_clinics_list.append(patient_clinic)
+
+        db.session.add_all(patient_clinics_list)
+        db.session.commit()
+
+        print("Seeding appointments...")
+
+        appointments_list = []
+
+        for _ in range(20):
+            appointment = Appointment(
+                date=faker.date_between_dates(date_start=datetime.now() - timedelta(days=365), date_end=datetime.now()),
+                time=generate_weekday_time(),
+                patient=random.choice(patients_list),
+                provider=random.choice(providers_list),
+            )
+            appointments_list.append(appointment)
+
+        db.session.add_all(appointments_list)
+        db.session.commit()
+
+        print("Seeding complete!")

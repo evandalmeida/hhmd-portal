@@ -1,8 +1,9 @@
-from sqlalchemy_serializer import SerializerMixin
+
+
 from datetime import datetime
-
 from config import db
-
+from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.ext.associationproxy import association_proxy
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -14,19 +15,27 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    serialize_rules = ('-password_hash', '-email')
+    # Define a one-to-one relationship with Clinic
+    clinic = db.relationship('Clinic', back_populates='user', uselist=False, primaryjoin="User.id == Clinic.user_id")
 
-class Clinic(db.Model):
+    # Define a one-to-one relationship with Patient
+    patient = db.relationship('Patient', back_populates='user', uselist=False)
+
+class Clinic(db.Model, SerializerMixin):
     __tablename__ = 'clinics'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
-    city = db.Column(db.String, nullable=False)
-    zip_code = db.Column(db.Integer, nullable=False)
+    state = db.Column(db.String(2))
+    zip_code = db.Column(db.String(10))
 
-    providers = db.relationship('Provider', back_populates='clinics')
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', back_populates='clinic', uselist=False)
+
+    # Define a many-to-many relationship with Patient
     patients = db.relationship('Patient', secondary='patient_clinics', back_populates='clinics')
+    patients_proxy = association_proxy('patients', 'id')  # Proxy for patient IDs
 
 class Provider(db.Model, SerializerMixin):
     __tablename__ = 'providers'
@@ -37,10 +46,8 @@ class Provider(db.Model, SerializerMixin):
     provider_type = db.Column(db.String, nullable=False)
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'))
 
-    clinics = db.relationship('Clinic', back_populates='providers')
+    # Define a one-to-many relationship with Appointment
     appointments = db.relationship('Appointment', back_populates='provider')
-
-    serialize_rules = ('-clinics',)
 
 class Appointment(db.Model, SerializerMixin):
     __tablename__ = 'appointments'
@@ -51,71 +58,39 @@ class Appointment(db.Model, SerializerMixin):
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     provider_id = db.Column(db.Integer, db.ForeignKey('providers.id'))
 
-    patients = db.relationship('Patient', back_populates='appointments')
-    provider = db.relationship('Provider')
+    # Define a many-to-one relationship with Patient
+    patient = db.relationship('Patient', back_populates='appointments')
 
-    serialize_rules = ('-patients.DL_image',)
+    # Define the many-to-one relationship with Provider
+    provider = db.relationship('Provider', back_populates='appointments')
 
-class Patient(db.Model):
+
+class Patient(db.Model, SerializerMixin):
     __tablename__ = 'patients'
 
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
     dob = db.Column(db.Date, nullable=False)
-    address = db.Column(db.String, nullable=False)
-    DL_image = db.Column(db.LargeBinary)
-    rx = db.Column(db.String)
+    street_address = db.Column(db.String, nullable=False)
+    state = db.Column(db.String(2))
+    zip_code = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    appointments = db.relationship('Appointment', back_populates='patients')
+    # Define a one-to-one relationship with User
+    user = db.relationship('User', back_populates='patient', uselist=False)
+
+    # Define a many-to-many relationship with Clinic
     clinics = db.relationship('Clinic', secondary='patient_clinics', back_populates='patients')
-    signatures = db.relationship('FormSignature', back_populates='patients')
+    clinics_proxy = association_proxy('clinics', 'id')  # Proxy for clinic IDs
 
-class Form(db.Model):
-    __tablename__ = 'forms'
+    # Define the one-to-many relationship with Appointment
+    appointments = db.relationship('Appointment', back_populates='patient')
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    document_type = db.Column(db.String)
 
-    signatures = db.relationship('FormSignature', back_populates='forms')
-
-class PatientClinic(db.Model):
+class PatientClinic(db.Model, SerializerMixin):
     __tablename__ = 'patient_clinics'
 
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'))
-
-class PatientForm(db.Model):
-    __tablename__ = 'patient_forms'
-
-    id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
-    form_id = db.Column(db.Integer, db.ForeignKey('forms.id'))
-
-class FormSignature(db.Model):
-    __tablename__ = 'form_signatures'
-
-    id = db.Column(db.Integer, primary_key=True)
-    form_id = db.Column(db.Integer, db.ForeignKey('forms.id'))
-    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
-    envelope_id = db.Column(db.String)
-    signature_id = db.Column(db.String)
-    signed_status = db.Column(db.String)
-
-    forms = db.relationship('Form', back_populates='signatures')
-    patients = db.relationship('Patient', back_populates='signatures')
-
-    serialize_rules = ('-forms', '-patients')
-
-class DocumentFile(db.Model):
-    __tablename__ = 'document_files'
-
-    id = db.Column(db.Integer, primary_key=True)
-    file_name = db.Column(db.String, nullable=False)
-    file_path = db.Column(db.String)
-    form_id = db.Column(db.Integer, db.ForeignKey('forms.id'))
-    form_signature_id = db.Column(db.Integer, db.ForeignKey('form_signatures.id'))
-
-    serialize_rules = ('-form_signature',)
