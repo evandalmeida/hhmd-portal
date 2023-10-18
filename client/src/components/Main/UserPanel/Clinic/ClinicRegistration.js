@@ -1,7 +1,8 @@
-// ClinicRegistration.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const ClinicRegistration = () => {
+const ClinicRegistration = ({ setCurrentUser }) => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,101 +12,91 @@ const ClinicRegistration = () => {
   const [clinicZipCode, setClinicZipCode] = useState('');
   const [error, setError] = useState('');
 
-  const handleRegistration = async () => {
+  const handleRegistration = async (e) => {
+    e.preventDefault();
+
     try {
-      // Send a POST request to your server for clinic registration
-      const response = await fetch('/clinic_register', {
+      const response = await fetch('http://localhost:5555/clinic_admin-registration', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
-          username,
-          email,
-          password,
+          username: username,
+          email: email,
+          password: password,
           clinic_name: clinicName,
           clinic_address: clinicAddress,
           clinic_state: clinicState,
           clinic_zip_code: clinicZipCode,
         }),
       });
+      
 
       if (response.status === 200) {
-        // Successful clinic registration
-        // Redirect to the login page or show a success message
-        alert('Clinic registration successful. You can now log in.');
-        // You can use react-router-dom to navigate to the login page
+        setCurrentUser({ role: 'clinic_admin' });
+        navigate('/clinic-dashboard');
+      } else if (response.status === 409) {
+        setError('Email already exists');
       } else {
-        // Handle registration error
-        setError('User with this email already exists');
+        setError('Error registering clinic');
+        console.error('Error:', response.status, response.statusText);
       }
-    } catch (error) {
-      console.error('Clinic registration error:', error);
-      setError('An error occurred during registration');
+    } catch (err) {
+      console.error('Request Error:', err);
+      setError('Error registering clinic');
     }
   };
 
   return (
-    <div>
-      <h2>Clinic Registration</h2>
-      <div>
+    <div className="form">
+      <h2 className="heading">Clinic Registration</h2>
+      <form onSubmit={handleRegistration}>
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          autoComplete="username"
         />
-      </div>
-      <div>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
         />
-      </div>
-      <div>
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
         />
-      </div>
-      <div>
         <input
           type="text"
           placeholder="Clinic Name"
           value={clinicName}
           onChange={(e) => setClinicName(e.target.value)}
         />
-      </div>
-      <div>
         <input
           type="text"
           placeholder="Clinic Address"
           value={clinicAddress}
           onChange={(e) => setClinicAddress(e.target.value)}
         />
-      </div>
-      <div>
         <input
           type="text"
           placeholder="Clinic State"
           value={clinicState}
           onChange={(e) => setClinicState(e.target.value)}
         />
-      </div>
-      <div>
         <input
           type="text"
           placeholder="Clinic Zip Code"
           value={clinicZipCode}
           onChange={(e) => setClinicZipCode(e.target.value)}
         />
-      </div>
-      {error && <p>{error}</p>}
-      <button onClick={handleRegistration}>Register Clinic</button>
+        {error && <p className="error-message">{error}</p>}
+        <button type="submit">Register Clinic</button>
+      </form>
     </div>
   );
 };

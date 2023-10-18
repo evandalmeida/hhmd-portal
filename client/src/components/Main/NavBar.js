@@ -26,10 +26,10 @@ const NavBar = ({ isLoggedIn, onLogout }) => {
               <Link to="/login">Login</Link>
             </li>
             <li>
-              <Link to="/clinic-registration">Clinic Registration</Link>
+              <Link to="/clinic-register">Clinic Registration</Link>
             </li>
             <li>
-              <Link to="/patient-registration">Patient Registration</Link>
+              <Link to="/patient-register">Patient Registration</Link>
             </li>
           </React.Fragment>
         )}

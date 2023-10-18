@@ -1,7 +1,121 @@
-:root {
-  --bg: #282c34;
-  --header: #fff;
-  --link: #61dafb;
-  --text: hsla(0, 0%, 100%, 0.88);
+/* Logo and Header */
+#head {
+  display: flex;
+  justify-content: center;
+  height: 25vh;
+  align-items: center;
+  width: 100vw;
 }
 
+#logo {
+  aspect-ratio: 1 / 1;
+  width: 20vh;
+  height: auto;
+  max-width: 20vh;
+  max-height: 20vh;
+  justify-self: center;
+}
+
+#title {
+  display: flex;
+  font-size: 4rem;
+  font-family: 'Roboto', sans-serif;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Updated CSS for the route */
+:root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #F3F3F3; /* Light gray background */
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Heading */
+.heading {
+  text-align: center;
+  font-size: 3rem;
+  margin-top: 1.5rem;
+  font-family: 'Roboto', sans-serif;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.form {
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  border-radius: 10px 100px / 120px 100px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  border: 1px solid #ccc;
+  margin: auto;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Form Elements */
+.form input {
+  display: block;
+  text-align: center;
+  width: 70%;
+  height: auto;
+  margin: 1rem auto;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 0.5rem;
+  font-family: 'Roboto', sans-serif;
+  font-style: black;
+  font-size: 1rem;
+}
+
+.form input::placeholder {
+  color: black;
+}
+
+/* Form Button */
+.form button {
+  background-color: #1AA18F;
+  color: #fff;
+  padding: 1rem 2rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  border: 1px solid black;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  border-radius: 10px 100px / 120px 100px;
+  transition: background-color 0.3s, color 0.3s;
+  font-family: 'Roboto', sans-serif;
+}
+
+.form button:hover {
+  background-color: #fff;
+  color: #1AA1AF;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.homebutton {
+  background-color: #1AA18F;
+  color: #fff;
+  padding: 1rem 2rem;
+  width: 20%;
+  cursor: pointer;
+  border: 2px solid black;
+  border-radius: 10px 100px / 120px 100px;
+  transition: background-color 0.3s, color 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  margin: .7rem auto;
+  font-size: 1.2rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+.homebutton:hover {
+  background-color: #fff;
+  color: #1AA1AF;
+}

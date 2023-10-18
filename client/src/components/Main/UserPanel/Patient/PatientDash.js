@@ -1,31 +1,28 @@
-
-
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios'; // Import Axios for making HTTP requests
+import axios from 'axios';
 
-const PatientDashboard = () => {
+const PatientDashboard = ({ currentUser }) => {
   const [patientInfo, setPatientInfo] = useState({});
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
 
   useEffect(() => {
     // Make API requests to get patient data and upcoming appointments
-    axios.get('/api/patient_info')
-      .then(response => {
-        setPatientInfo(response.data); // Assuming you have an API endpoint /api/patient_info
+    axios.get(`/api/patient_info/${currentUser.id}`)
+      .then((response) => {
+        setPatientInfo(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching patient info', error);
       });
 
-    axios.get('/api/upcoming_appointments')
-      .then(response => {
-        setUpcomingAppointments(response.data); // Assuming you have an API endpoint /api/upcoming_appointments
+    axios.get(`/api/upcoming_appointments/${currentUser.id}`)
+      .then((response) => {
+        setUpcomingAppointments(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching upcoming appointments', error);
       });
-  }, []);
+  }, [currentUser.id]);
 
   return (
     <div>
@@ -35,15 +32,12 @@ const PatientDashboard = () => {
 
       <h2>Upcoming Appointments:</h2>
       <ul>
-        {upcomingAppointments.map(appointment => (
+        {upcomingAppointments.map((appointment) => (
           <li key={appointment.id}>
             {appointment.date} at {appointment.time}
           </li>
         ))}
       </ul>
-
-      <Link to="/schedule-appointment">Schedule New Appointment</Link>
-      <Link to="/patient-profile">View Profile</Link>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-// PatientRegistration.js
 import React, { useState } from 'react';
 
 const PatientRegistration = () => {
@@ -7,10 +6,11 @@ const PatientRegistration = () => {
     email: '',
     password: '',
     first_name: '',
-    last_name: '', // Add the additional fields here
+    last_name: '',
     street_address: '',
     state: '',
     zip_code: '',
+    dob: '', // Add the date of birth field
   });
   const [error, setError] = useState('');
 
@@ -55,9 +55,9 @@ const PatientRegistration = () => {
   };
 
   return (
-    <div>
-      <h2>Patient Registration</h2>
-      <div>
+    <div className='form'>
+      <h2 className='heading'>Patient Registration</h2>
+      <form>
         <input
           type="text"
           placeholder="Username"
@@ -65,8 +65,7 @@ const PatientRegistration = () => {
           value={user.username}
           onChange={handleInputChange}
         />
-      </div>
-      <div>
+
         <input
           type="email"
           placeholder="Email"
@@ -74,8 +73,7 @@ const PatientRegistration = () => {
           value={user.email}
           onChange={handleInputChange}
         />
-      </div>
-      <div>
+
         <input
           type="password"
           placeholder="Password"
@@ -83,8 +81,7 @@ const PatientRegistration = () => {
           value={user.password}
           onChange={handleInputChange}
         />
-      </div>
-      <div>
+
         <input
           type="text"
           placeholder="First Name"
@@ -92,8 +89,7 @@ const PatientRegistration = () => {
           value={user.first_name}
           onChange={handleInputChange}
         />
-      </div>
-      <div>
+
         <input
           type="text"
           placeholder="Last Name"
@@ -101,8 +97,7 @@ const PatientRegistration = () => {
           value={user.last_name}
           onChange={handleInputChange}
         />
-      </div>
-      <div>
+
         <input
           type="text"
           placeholder="Street Address"
@@ -110,8 +105,7 @@ const PatientRegistration = () => {
           value={user.street_address}
           onChange={handleInputChange}
         />
-      </div>
-      <div>
+
         <input
           type="text"
           placeholder="State"
@@ -119,8 +113,7 @@ const PatientRegistration = () => {
           value={user.state}
           onChange={handleInputChange}
         />
-      </div>
-      <div>
+
         <input
           type="text"
           placeholder="Zip Code"
@@ -128,7 +121,15 @@ const PatientRegistration = () => {
           value={user.zip_code}
           onChange={handleInputChange}
         />
-      </div>
+        <input
+            type="date"
+            placeholder="Date of Birth"
+            name="dob"
+            value={user.dob}
+            onChange={handleInputChange}
+            style={{ fontFamily: 'sans-serif' }} // Change the font here
+          />
+      </form>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <button onClick={handleRegistration}>Register Patient</button>
     </div>
