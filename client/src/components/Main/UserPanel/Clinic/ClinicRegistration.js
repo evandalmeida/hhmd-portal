@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ClinicRegistration = ({ setCurrentUser }) => {
+const ClinicRegistration = ({attemptClinicSignup}) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -12,43 +12,43 @@ const ClinicRegistration = ({ setCurrentUser }) => {
   const [clinicZipCode, setClinicZipCode] = useState('');
   const [error, setError] = useState('');
 
-  const handleRegistration = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch('http://localhost:5555/clinic_admin-registration', {
-        method: 'POST',
-        body: JSON.stringify({
-          username: username,
-          email: email,
-          password: password,
-          clinic_name: clinicName,
-          clinic_address: clinicAddress,
-          clinic_state: clinicState,
-          clinic_zip_code: clinicZipCode,
-        }),
-      });
-      
+    if (!username || !email || !password || !clinicName || !clinicAddress || !clinicState || !clinicZipCode) {
+      setError('Please fill in all the required fields.');
+      return;
+    }
 
-      if (response.status === 200) {
-        setCurrentUser({ role: 'clinic_admin' });
-        navigate('/clinic-dashboard');
-      } else if (response.status === 409) {
-        setError('Email already exists');
+    const registrationData = {
+      username,
+      email,
+      password,
+      clinic_name: clinicName,
+      clinic_address: clinicAddress,
+      clinic_state: clinicState,
+      clinic_zip_code: clinicZipCode,
+      role:'clinic_admin',
+    };
+
+    try {
+      const response = await attemptClinicSignup(registrationData);
+
+      if (response.ok) {
+        navigate('/login');
       } else {
-        setError('Error registering clinic');
-        console.error('Error:', response.status, response.statusText);
+        const errorData = await response.json();
+        setError(errorData.error || 'Registration failed');
       }
-    } catch (err) {
-      console.error('Request Error:', err);
-      setError('Error registering clinic');
+    } catch (error) {
+      setError('An error occurred during registration.');
     }
   };
 
   return (
     <div className="form">
       <h2 className="heading">Clinic Registration</h2>
-      <form onSubmit={handleRegistration}>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Username"
@@ -68,7 +68,7 @@ const ClinicRegistration = ({ setCurrentUser }) => {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
+          autoComplete="new-password"
         />
         <input
           type="text"

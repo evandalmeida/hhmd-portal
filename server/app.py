@@ -1,69 +1,35 @@
 
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager
 from models import User, Clinic, Appointment, Patient
 from flask import request, jsonify, session
 from config import app, db, bcrypt
+from datetime import timedelta 
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=1) 
+
+jwt = JWTManager(app)
 
 
 # SHARED ROUTES
-@app.get('/check_session')
-def check_session():
-    user_id = session.get('user_id')
-    if user_id:
-        user = User.query.filter(User.id == user_id).first()
-        return user.to_dict(), 200
-    else:
-        return {}, 401
-    
-
     
 @app.route('/login', methods=['POST'])
 def login():
-    try:
-        data = request.get_json()
+    data = request.get_json()
 
-        if 'email' not in data or 'password' not in data:
-            return jsonify({'error': 'Email and password are required'}), 400
+    user = User.query.filter_by(email=data['email']).first()
 
-        user = User.query.filter_by(email=data['email']).first()
+    if user and bcrypt.check_password_hash(user.password_hash, data["password"].encode('utf-8')):
+        access_token = create_access_token(identity=user.serialize())
+        return jsonify({"access_token": access_token, "user": user.serialize()})
 
-        if not user:
-            return jsonify({'error': 'User not found'}), 401
+    return jsonify(message="Invalid username or password"), 401
 
-        if not bcrypt.check_password_hash(user.password_hash, data['password']):
-            return jsonify({'error': 'Invalid password'}), 401
-
-        access_token = create_access_token(identity=user.id)
-
-        return jsonify(access_token=access_token, role=user.role)
-    except Exception as e:
-        app.logger.error(f"Login error: {str(e)}")
-        return jsonify({'error': 'Internal Server Error'}), 500
-
-@app.delete('/logout')
-def logout():
-    session.pop('user_id')
-    return {}, 204
-
-@app.route('/users', methods=['POST'])
-def create_user():
-    try:
-        data = request.json
-        hashed_pw = bcrypt.generate_password_hash(data["password"].encode('utf-8'), 10)
-
-        # Creating the new user
-        new_user = User.create(username=data['username'], hashed_password=hashed_pw)
-
-        # Committing the user to the database
-        db.session.commit()
-
-        session['user_id'] = new_user.id
-        return new_user.to_dict(), 201
-    except Exception as e:
-        print(e)  # Log the error for debugging
-        db.session.rollback()
-        return {'error': str(e)}, 500
-    
 
 
 
@@ -90,19 +56,16 @@ def clinic_info():
 
     return jsonify(clinic_info)
 
-@app.route('/clinic_admin-registration', methods=['POST', 'OPTIONS'])
-def clinic_register():
-    if request.method == 'OPTIONS':
-        # This is an OPTIONS request, respond with 200 OK.
-        return '', 200
 
+
+@app.route('/clinic_admin-registration', methods=['POST'])
+def clinic_register():
     try:
         data = request.get_json()
 
-        # Extract data and validate it
         username = data.get('username')
-        password = data.get('password')
         email = data.get('email')
+        password = data.get('password')  
         clinic_name = data.get('clinic_name')
 
         if not all([username, password, email, clinic_name]):
@@ -110,16 +73,14 @@ def clinic_register():
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            return jsonify({'error': 'User with this email already exists'}), 409  # 409 for conflict
+            return jsonify({'error': 'User with this email already exists'}), 409
 
-        # Hash the password before creating the user
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        password_hash = bcrypt.generate_password_hash(password.encode('utf-8'), 10)
 
-        # Create and add a new user and clinic
         new_user = User(
             username=username,
-            password_hash=hashed_password,  # Use the hashed password
             email=email,
+            password_hash=password_hash.decode('utf-8'),  
             role='clinic_admin',
         )
 
@@ -138,8 +99,8 @@ def clinic_register():
         return jsonify({'message': 'Clinic registered successfully'})
 
     except Exception as e:
-        app.logger.error(f"Error during clinic registration: {str(e)}")
-        return jsonify({'error': 'An error occurred during registration'}), 500
+        return jsonify({'error': 'An error occurred during registration', 'error_message': str(e)}), 500
+
 
 
 @app.route('/patients')
@@ -167,6 +128,7 @@ def get_patients():
     return jsonify({'patients': serialized_patients})
 
 
+
 ## APPOINTMENTS FOR CLINCS
 @app.route('/appointments')
 @jwt_required()
@@ -185,6 +147,7 @@ def get_appointments():
     appointment_list = [{"id": appointment.id, "date": appointment.date, "time": appointment.time} for appointment in appointments]
 
     return jsonify(appointment_list)
+
 
 
 if __name__ == '__main__':
