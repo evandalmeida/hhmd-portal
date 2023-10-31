@@ -1,97 +1,86 @@
 
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
-import ClinicRegistration from './Main/UserPanel/Clinic/ClinicRegistration'; 
-import PatientRegistration from './Main/UserPanel/Patient/PatientRegistration';
-import Login from './Main/UserPanel/Login';
-import ClinicDashboard from './Main/UserPanel/Clinic/ClinicDash';
-import PatientDashboard from './Main/UserPanel/Patient/PatientDash';
-import LandingPage from './LandingPage';
+const POST_HEADERS = {
+  'Content-Type': 'application/json',
+  'Accepts': 'application/json'
+}
 
+const URL = "/api/v1"
 
-const App = () => {
-  const [currentUser, setCurrentUser] = useState({});
+export default function App() {
 
+  const navigate = useNavigate()
+  const [currentUser, setCurrentUser] = useState(
 
-  async function attemptClinicSignup(userInfo) {
-    const res = await fetch('/clinic_admin-registration', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${currentUser.access_token}`
-      },
-      body: JSON.stringify(userInfo)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setCurrentUser(data);
-    } else {
-      const errorData = await res.json();
-      alert(errorData.error || 'Invalid sign up');
-    }
-  }
+  );
+
+  useEffect( () => {
+    fetch(URL + '/check_session')
+    .then((response) => {
+      if (response.ok) {
+        response.json()
+    .then((data) => {
+      setCurrentUser(data)
+      const role = data.role;
+
+      if (role === 'clinic_admin') {navigate('/clinic-dashboard')}
+      else if (role === 'patient') {navigate('/patient-dashboard')}
+    })
+      } else {navigate('/landing')}
+    })
+  }, [navigate]) 
 
   async function attemptLogin(userInfo) {
-    const res = await fetch('/login', {
+    const res = await fetch(URL + '/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: POST_HEADERS,
       body: JSON.stringify(userInfo)
-    });
+    })
     if (res.ok) {
       const data = await res.json();
       setCurrentUser(data);
-      return data;
-    } else {
+      return data
+    } 
+    else {
       alert('Invalid login');
       return false;
     }
   }
 
-  function logout() {
-    setCurrentUser(null);
-    fetch('/logout', {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${currentUser.access_token}`
-      },
-    });
+  async function attemptClinicSignup(userInfo) {
+    try {
+    const res = await fetch(URL + '/clinic_admin-registration', {
+      method: 'POST',
+      headers: POST_HEADERS,
+      body: JSON.stringify(userInfo)
+    })
+    if (res.ok) {
+      const data = await res.json();
+      setCurrentUser(data);
+    } else {
+      alert('Invalid sign up')
+    }
+  } catch (error){
+    alert(error)
+  }
   }
 
-  
+  function logout() {
+    setCurrentUser(null)
+    fetch(URL + '/logout', {
+      method: 'DELETE'
+    })
+
+    navigate('/landing')
+  }
+
+
+
   return (
-    <Router>
-      <div>
-        <Routes>
-          <Route path="/" element={<LandingPage currentUser={currentUser} logout={logout}/>} />
-          <Route path="/clinic_admin-registration" element={<ClinicRegistration attemptLogin={attemptLogin} setCurrentUser={setCurrentUser} attemptClinicSignup={attemptClinicSignup}/>} />
-          <Route path="/patient-registration" element={<PatientRegistration setCurrentUser={setCurrentUser} />} />
-          <Route path="/login" element={<Login attemptLogin={attemptLogin} />} />
-          <Route
-            path={
-              currentUser && currentUser.user?.role === 'clinic_admin'
-                ? '/clinic-dashboard'
-                : currentUser && currentUser.user?.role === 'patient'
-                ? '/patient-dashboard'
-                : null
-            }
-            element={
-              currentUser && currentUser.user?.role === 'clinic_admin'
-                ? <ClinicDashboard currentUser={currentUser} logout={logout} />
-                : currentUser && currentUser.user?.role === 'patient'
-                ? <PatientDashboard currentUser={currentUser} logout={logout} />
-                : null 
-            }
-          />
-        </Routes>
-      </div>
-    </Router>
+    <>
+      <Outlet context={{ currentUser, attemptLogin, attemptClinicSignup, logout }} />
+    </>
   );
-};
-
-
-export default App;
-
-
+}

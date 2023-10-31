@@ -1,34 +1,39 @@
 
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import ClinicDashboard from './Clinic/ClinicDash';
 import PatientDashboard from './Patient/PatientDash';
 
-const Login = ({ attemptLogin }) => {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [userRole, setUserRole] = useState(null);
-  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
+  const navigate = useNavigate();
+  const {attemptLogin} = useOutletContext() ?? {} ;
+
+  async function handleLogin(e) {
+    e.preventDefault();
+  
     try {
       const loginInfo = {
         email: email,
         password: password,
       };
   
-      const loginSuccess = await attemptLogin(loginInfo);
-      
-      if (loginSuccess) {
-        setUserRole(loginSuccess.user.role);
+      const response = await attemptLogin(loginInfo);
   
-        if (loginSuccess.user.role === 'clinic_admin') {
-          navigate('/clinic-dashboard');  // No need for full URL
-        } else if (loginSuccess.user.role === 'patient') {
-          navigate('/patient-dashboard');  // No need for full URL
+      if (response) {
+        setUserRole(response?.user?.role);
+  
+        if (response?.user?.role === 'clinic_admin') {
+          navigate('/clinic-dashboard');
+        } else if (response?.user?.role === 'patient') {
+          navigate('/patient-dashboard');
+        } else {
+          setError('Invalid email or password');
         }
       } else {
         setError('Invalid email or password');
@@ -37,7 +42,8 @@ const Login = ({ attemptLogin }) => {
       console.error('Login error:', error);
       setError('An error occurred during login');
     }
-  };
+  }
+  
   
 
   return (
@@ -61,8 +67,8 @@ const Login = ({ attemptLogin }) => {
 
       {userRole === 'clinic_admin' && <ClinicDashboard />}
       {userRole === 'patient' && <PatientDashboard />}
+
     </form>
   );
-};
 
-export default Login;
+};

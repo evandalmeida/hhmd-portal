@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext} from 'react-router-dom';
 
-const ClinicRegistration = ({attemptClinicSignup}) => {
+export default function ClinicRegistration() {
+
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  const {attemptClinicSignup} = useOutletContext()
+
   const [email, setEmail] = useState('');
+  // eslint-disable-next-line
+  const [error, setError] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [clinicName, setClinicName] = useState('');
-  const [clinicAddress, setClinicAddress] = useState('');
   const [clinicState, setClinicState] = useState('');
   const [clinicZipCode, setClinicZipCode] = useState('');
-  const [error, setError] = useState('');
+  const [clinicAddress, setClinicAddress] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    if (!username || !email || !password || !clinicName || !clinicAddress || !clinicState || !clinicZipCode) {
-      setError('Please fill in all the required fields.');
-      return;
-    }
+  async function handleSubmit(e) {
+    e.preventDefault()
+    console.log(e)
 
+    try {
     const registrationData = {
       username,
       email,
@@ -31,19 +33,19 @@ const ClinicRegistration = ({attemptClinicSignup}) => {
       role:'clinic_admin',
     };
 
-    try {
-      const response = await attemptClinicSignup(registrationData);
+    const registrationSuccess = await attemptClinicSignup(registrationData);
 
-      if (response.ok) {
-        navigate('/login');
+    if (registrationSuccess) {
+      navigate('/clinic-dashboard')
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Registration failed');
+        setError('Invalid');
       }
-    } catch (error) {
-      setError('An error occurred during registration.');
-    }
-  };
+  } catch (error) {
+    console.error('Registration error:', error);
+    setError('An error occurred during registration');
+    navigate('/clinic_admin-registration')
+  }
+  }
 
   return (
     <div className="form">
@@ -94,11 +96,8 @@ const ClinicRegistration = ({attemptClinicSignup}) => {
           value={clinicZipCode}
           onChange={(e) => setClinicZipCode(e.target.value)}
         />
-        {error && <p className="error-message">{error}</p>}
         <button type="submit">Register Clinic</button>
       </form>
     </div>
   );
-};
-
-export default ClinicRegistration;
+}

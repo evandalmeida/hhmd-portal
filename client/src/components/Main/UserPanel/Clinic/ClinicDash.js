@@ -1,57 +1,107 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
-export default function ClinicDashboard({ currentUser, logout }) {
+export default function ClinicDashboard() {
+  const { currentUser, logout } = useOutletContext();
   const [appointments, setAppointments] = useState([]);
   const [clinicInfo, setClinicInfo] = useState({});
-  const [patients, setPatients] = useState([]);
+  const [patients, setPatients] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  console.log(currentUser)
 
   useEffect(() => {
-    if (currentUser.user?.role === "clinic_admin") {
-      // Define headers with JWT token
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${currentUser.access_token}` // Assuming the token is stored in currentUser.access_token
-      };
+    if (currentUser?.user?.role === 'clinic_admin') {
+      // Fetch clinic information
+      fetch(URL + '/clinic_info')
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Failed to fetch clinic info');
+          }
+        })
+        .then((data) => setClinicInfo(data))
+        .catch((error) => console.error('Error fetching clinic info: ', error));
 
-      // Fetch clinic info with headers
-      fetch('/clinic_info', { headers })
-        .then((response) => response.json())
-        .then((data) => setClinicInfo(data)) // Update the clinicInfo state
+      // Fetch appointments
+      fetch(URL + '/appointments')
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Failed to fetch appointments');
+          }
+        })
+        .then((data) => setAppointments(data))
+        .catch((error) => console.error('Error fetching appointments: ', error));
 
-      // Fetch appointments with headers
-      fetch('/appointments', { headers })
-        .then((response) => response.json())
-        .then((appointments) => setAppointments(appointments)) // Update the appointments state
-
-      // Fetch patients with headers
-      fetch('/patients', { headers })
-        .then((response) => response.json())
-        .then((patients) => setPatients(patients)) // Update the patients state
+      // Fetch patients
+      fetch(URL + '/patients')
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw Error('Failed to fetch patients');
+          }
+        })
+        .then((data) => setPatients(data.patients))
+        .catch((error) => console.error('Error fetching patients: ', error))
+        .finally(() => setIsLoading(false));
     }
   }, [currentUser]);
 
-  if (currentUser.user?.role === "clinic_admin") {
-    return (
+  return (
+    <div className="dash">
       <div>
-        <h2>Clinic Information</h2>
-        <button className='logout' onClick={logout}>Logout</button> 
-        <p>Name: {clinicInfo.name}</p>
-        <p>Address: {clinicInfo.address}</p>
-        <p>State: {clinicInfo.state}</p>
-        <p>Zip Code: {clinicInfo.zip_code}</p>
+        <button onClick={logout} className='logout'>Logout</button>
+        <p>Welcome {currentUser?.id}</p>
 
-        <h2>Appointments</h2>
-        <ul>
-          {appointments.map((appointment) => (<li key={appointment.id}>Date: {appointment.date}, Time: {appointment.time}</li>))}
-        </ul>
-
-        <h2>Patients</h2>
-        <ul>
-          {patients.map((patient) => (<li key={patient.id}>Name: {patient.first_name} {patient.last_name}, DOB: {patient.dob}</li>))}
-        </ul>
       </div>
-    );
-  } else {
-    return <p>Null or whatever idk</p>
-  }
+      <div>
+        <h2>Your Clinic:</h2>
+        {isLoading ? (
+          <p>Loading clinic information...</p>
+        ) : (
+          <div>
+            <p>Name: {clinicInfo.name}</p>
+            <p>Address: {clinicInfo.address}</p>
+            <p>State: {clinicInfo.state}</p>
+            <p>Zip Code: {clinicInfo.zip_code}</p>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2>Appointments</h2>
+        {isLoading ? (
+          <p>Loading appointments...</p>
+        ) : (
+          <ul>
+            {appointments.map((appointment) => (
+              <li key={appointment.id}>
+                Date: {appointment.date}, Time: {appointment.time}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div>
+        <h2>Patients</h2>
+        {isLoading ? (
+          <p>Loading patients...</p>
+        ) : (
+          <ul>
+            {patients.map((patient) => (
+              <li key={patient.id}>
+                Name: {patient.first_name} {patient.last_name}, DOB: {patient.dob}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+    </div>
+  );
 }

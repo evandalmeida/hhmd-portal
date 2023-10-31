@@ -16,6 +16,18 @@
   justify-self: center;
 }
 
+@media (max-width: 768px) {
+  #logo {
+      aspect-ratio: 1 / 1;
+      width: 5vh;
+      height: auto;
+      max-width: 5vh;
+      max-height: 5vh;
+      justify-self: center;
+  }
+}
+
+
 #title {
   display: flex;
   font-size: 4rem;
@@ -105,9 +117,12 @@
 .homebutton {
   background-color: #1AA18F;
   color: #fff;
-  padding: 1rem 2rem;
   width: 20%;
   cursor: pointer;
+  padding-left: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 10px;
   border: 2px solid black;
   border-radius: 10px 100px / 120px 100px;
   transition: background-color 0.3s, color 0.3s;
@@ -115,9 +130,53 @@
   margin: .7rem auto;
   font-size: 1.2rem;
   font-family: 'Roboto', sans-serif;
+  text-align: center;
 }
 
 .homebutton:hover {
   background-color: #fff;
   color: #1AA1AF;
+}
+
+
+@media (max-width: 768px) {
+  .homebutton {
+    font-size: 2rem;
+  }
+}
+
+
+
+.dash {
+  margin: auto;
+  height: auto;
+  width: 60vw;
+  padding: auto;
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  gap: 10vh;
+
+  color: black;
+
+}
+
+
+.logout {
+  margin-left: 50vw;
+  margin-right: 10vw;
+  width: 30%;
+  height: 5vh;
+  color: black;
+  background-color: transparent;
+  text-align: center;
+  border-radius: 10px 100px / 120px 100px;
+
+}
+
+.logout:hover {
+  background-color: red;
+  color: white;
+  border: 1px solid white;
+  box-shadow: 0 4px 8px rgb(255, 0, 0);
 }
