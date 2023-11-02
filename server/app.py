@@ -1,4 +1,4 @@
-from models import User, Clinic, Patient, Appointment
+from models import User, Clinic, Patient, Appointment, Provider
 from flask import request, jsonify, session
 from config import app, db, bcrypt
 
@@ -138,14 +138,11 @@ def patient_register():
 @app.route(URL + '/clinic_info')
 def clinic_info():
   if current_user().role == 'clinic_admin':
-    
-    # Get the clinic for the current user 
     clinic = current_user().clinic
-    
-    if not clinic:
-      return jsonify({'error': 'Clinic not found'}), 404
 
-    # Return serialized clinic data
+    if not clinic:
+      return jsonify({'error': 'Information not found'}), 404
+    
     return jsonify(clinic.to_dict())
 
   else:
@@ -153,7 +150,7 @@ def clinic_info():
   
 
 # GET PATIENTS
-@app.route('/patients')
+@app.route(URL + '/patients')
 def get_patients():
     if current_user().role == 'clinic_admin':
         clinic = Clinic.query.get(current_user().clinic.id)
@@ -161,36 +158,38 @@ def get_patients():
             return jsonify({'error': 'Clinic not found'}), 404
         patients = clinic.patients
 
-    elif current_user().role == 'patient':
-        patient = Patient.query.get(current_user().patient.id)
-        if not patient:
-            return jsonify({'error': 'Patient not found'}), 404
-        patients = [patient]
+        return jsonify([patient.to_dict() for patient in patients ])
 
     else:
         return jsonify({'error': 'Unauthorized'}), 401
 
-    # Serialize patients using the to_dict method
-    serialized_patients = [patient.to_dict() for patient in patients]
-
-    return jsonify({'patients': serialized_patients})
 
 
 # APPOINTMENTS FOR CLINICS
-@app.route('/appointments')
+@app.route(URL + '/providers')
 def get_appointments():
     if current_user().role == 'clinic_admin':
-        appointments = Appointment.query.filter_by(clinic_id=current_user().clinics.id)
 
-    elif current_user().role == 'patient':
-        appointments = Appointment.query.filter_by(patient_id=current_user().patients.id)
+        providers = Provider.query.filter_by(clinic_id=current_user().clinic.id)
+    
+        return jsonify([provider.to_dict() for provider in providers])
+
 
     else:
         return jsonify({'error': 'Unauthorized'}), 401
 
-    appointment_list = [{"id": appointment.id, "date": appointment.date.isoformat(), "time": appointment.time.strftime('%H:%M:%S')} for appointment in appointments]
 
-    return jsonify(appointment_list)
+
+    
+    # elif current_user().role == 'patient':
+    #     appointments = Appointment.query.filter_by(patient_id=current_user().patient.id)
+
+    #     return jsonify([appointment.to_dict() for appointment in appointments])
+    # appointment_list = [{"id": appointment.id, "date": appointment.date.isoformat(), "time": appointment.time.strftime('%H:%M:%S')} for appointment in appointments]
+
+    # return jsonify(appointment_list)
+
+
 
 if __name__ == '__main__':
     db.create_all() 

@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+import Footer from './Footer'
+
+
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -39,6 +42,7 @@ export default function LandingPage() {
               Login
             </button>
           </div>
+          <Footer/>
         </>
       ) : null}
     </>

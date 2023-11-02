@@ -17,7 +17,6 @@ if __name__ == '__main__':
         print("Seeding database...")
         print("Deleting old data...")
 
-        db.drop_all()
         db.create_all()
 
         print("Seeding users...")
@@ -72,7 +71,7 @@ if __name__ == '__main__':
                 first_name=first_name,
                 last_name=last_name,
                 provider_type=provider_type,
-                clinic_id=random.choice(clinics_list).id
+                clinic_id="6"
             )
 
             providers_list.append(provider)
@@ -84,7 +83,9 @@ if __name__ == '__main__':
 
         patients_list = []
 
-        for _ in range(10):
+        clinic_with_id_6 = Clinic.query.filter_by(id=6).first()
+
+        for _ in range(100):
             first_name = faker.first_name()
             last_name = faker.last_name()
             dob = faker.date_of_birth(tzinfo=None, minimum_age=18, maximum_age=90)
@@ -102,6 +103,8 @@ if __name__ == '__main__':
                 zip_code=zip_code,
                 user=user,
             )
+
+            patient.clinics.append(clinic_with_id_6)
 
             patients_list.append(patient)
 
