@@ -2,7 +2,6 @@ from config import db, bcrypt
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.associationproxy import association_proxy
 
-# Define the User model
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
@@ -24,7 +23,6 @@ class User(db.Model, SerializerMixin):
             'email': self.email
         }
 
-# Define the Clinic model
 class Clinic(db.Model, SerializerMixin):
     __tablename__ = 'clinics'
 
@@ -38,7 +36,7 @@ class Clinic(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='clinic', uselist=False)
     
 
-    # Define a many-to-many relationship with Patient
+    # M2M relationship with Patient
     patients = db.relationship('Patient', secondary='patient_clinics', back_populates='clinics')
     patients_proxy = association_proxy('patients', 'id') 
 
@@ -51,9 +49,6 @@ class Clinic(db.Model, SerializerMixin):
             'zip_code': self.zip_code
         }
     
-
-
-# Define the Provider model
 class Provider(db.Model, SerializerMixin):
     __tablename__ = 'providers'
 
@@ -63,7 +58,7 @@ class Provider(db.Model, SerializerMixin):
     provider_type = db.Column(db.String, nullable=False)
     clinic_id = db.Column(db.Integer, db.ForeignKey('clinics.id'))
 
-    # Define a one-to-many relationship with Appointment
+    # O2M relationship with Appointment
     appointments = db.relationship('Appointment', back_populates='provider')
 
     def to_dict(self):
@@ -74,11 +69,6 @@ class Provider(db.Model, SerializerMixin):
             'provider_type': self.provider_type
         }
 
-
-
-
-
-# Define the Appointment model
 class Appointment(db.Model, SerializerMixin):
     __tablename__ = 'appointments'
 
@@ -88,10 +78,10 @@ class Appointment(db.Model, SerializerMixin):
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     provider_id = db.Column(db.Integer, db.ForeignKey('providers.id'))
 
-    # Define a many-to-one relationship with Patient
+    # M2O relationship with Patient
     patient = db.relationship('Patient', back_populates='appointments')
 
-    # Define the many-to-one relationship with Provider
+    # M2o relationship with Provider
     provider = db.relationship('Provider', back_populates='appointments')
 
     def to_dict(self):
@@ -102,7 +92,6 @@ class Appointment(db.Model, SerializerMixin):
         }
 
 
-# Define the Patient model
 class Patient(db.Model, SerializerMixin):
     __tablename__ = 'patients'
 
@@ -115,14 +104,14 @@ class Patient(db.Model, SerializerMixin):
     zip_code = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    # Define a one-to-one relationship with User
+    # O2O relationship with User
     user = db.relationship('User', back_populates='patient', uselist=False)
 
-    # Define a many-to-many relationship with Clinic
+    # M2M relationship with Clinic
     clinics = db.relationship('Clinic', secondary='patient_clinics', back_populates='patients')
     clinics_proxy = association_proxy('clinics', 'id')
 
-    # Define the one-to-many relationship with Appointment
+    # O2M relationship with Appointment
     appointments = db.relationship('Appointment', back_populates='patient')
 
     def to_dict(self):
@@ -136,8 +125,10 @@ class Patient(db.Model, SerializerMixin):
             'zip_code': self.zip_code
         }
 
-# Define the many-to-many relationship table for patients and clinics
+# M2M relationship table for patients and clinics
 patient_clinics = db.Table('patient_clinics',
     db.Column('patient_id', db.Integer, db.ForeignKey('patients.id'), primary_key=True),
     db.Column('clinic_id', db.Integer, db.ForeignKey('clinics.id'), primary_key=True)
 )
+
+

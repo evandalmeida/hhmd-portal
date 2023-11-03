@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
+import Footer from './Main/Footer'
+
 const POST_HEADERS = {
   'Content-Type': 'application/json',
   'Accepts': 'application/json'
@@ -80,7 +82,13 @@ export default function App() {
 
   return (
     <>
-      <Outlet context={{ currentUser, attemptLogin, attemptClinicSignup, logout }} />
+      <div className='content'>
+        <Outlet context={{ currentUser, attemptLogin, attemptClinicSignup, logout }} />
+        <Footer/>
+      </div>
+      
     </>
   );
 }
+
+

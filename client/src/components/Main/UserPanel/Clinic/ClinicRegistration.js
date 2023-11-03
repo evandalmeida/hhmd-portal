@@ -19,7 +19,7 @@ export default function ClinicRegistration() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    console.log(e)
+    
 
     try {
     const registrationData = {
@@ -34,6 +34,8 @@ export default function ClinicRegistration() {
     };
 
     const registrationSuccess = await attemptClinicSignup(registrationData);
+
+
 
     if (registrationSuccess) {
       navigate('/clinic-dashboard')

@@ -165,7 +165,7 @@ def get_patients():
 
 
 
-# APPOINTMENTS FOR CLINICS
+# PROVIDERS FOR CLINICS
 @app.route(URL + '/providers')
 def get_appointments():
     if current_user().role == 'clinic_admin':
@@ -180,17 +180,74 @@ def get_appointments():
 
 
 
-    
-    # elif current_user().role == 'patient':
-    #     appointments = Appointment.query.filter_by(patient_id=current_user().patient.id)
+# Delete a patient
+@app.delete(URL + '/patients/<int:patient_id>')  
+def delete_patient(patient_id):
+  if current_user().role != 'clinic_admin':
+    return jsonify({'error': 'Unauthorized'}), 401
+  
+  patient = Patient.query.get(patient_id)
+  if not patient:
+    return jsonify({'error': 'Patient not found'}), 404
 
-    #     return jsonify([appointment.to_dict() for appointment in appointments])
-    # appointment_list = [{"id": appointment.id, "date": appointment.date.isoformat(), "time": appointment.time.strftime('%H:%M:%S')} for appointment in appointments]
+  db.session.delete(patient)
+  db.session.commit()
 
-    # return jsonify(appointment_list)
+  return {}, 204
+
+# Delete a provider  
+@app.delete(URL + '/providers/<int:provider_id>')
+def delete_provider(provider_id):
+  if current_user().role != 'clinic_admin':
+    return jsonify({'error': 'Unauthorized'}), 401
+
+  provider = Provider.query.get(provider_id)
+  if not provider:
+    return jsonify({'error': 'Provider not found'}), 404
+  
+  db.session.delete(provider)
+  db.session.commit()
+
+  return {}, 204
+@app.post('/new_providers')
+def add_provider():
+
+  print("/new_providers endpoint reached")
+
+  data = request.get_json()
+
+  print("Request data:", data)
+
+  first_name = data.get('first_name')
+  last_name = data.get('last_name')
+  provider_type = data.get('provider_type')
+
+  if not all([first_name, last_name, provider_type]):
+      print("/new_providers: Missing required fields")
+      return jsonify({'error': 'All fields are required'}), 400
+
+  print("/new_providers: Creating new provider...")
+
+  new_provider = Provider(
+      first_name=data['first_name'], 
+      last_name=data['last_name'],
+      provider_type=data['provider_type'],
+      clinic_id=current_user().clinic.id
+  )
+
+  print("/new_providers: Saving new provider...")
+  
+  db.session.add(new_provider)
+  db.session.commit()
+
+  print("/new_providers: Provider created!")
+
+  return jsonify(new_provider.to_dict()), 201
 
 
 
 if __name__ == '__main__':
     db.create_all() 
     app.run(port=5555, debug=True)
+
+

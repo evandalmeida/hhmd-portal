@@ -26,11 +26,11 @@ export default function Login() {
       const response = await attemptLogin(loginInfo);
   
       if (response) {
-        setUserRole(response?.user?.role);
+        setUserRole(response?.role);
   
-        if (response?.user?.role === 'clinic_admin') {
+        if (response?.role === 'clinic_admin') {
           navigate('/clinic-dashboard');
-        } else if (response?.user?.role === 'patient') {
+        } else if (response?.role === 'patient') {
           navigate('/patient-dashboard');
         } else {
           setError('Invalid email or password');
@@ -48,7 +48,7 @@ export default function Login() {
 
   return (
     <form className='form'>
-      <h2 className='heading'>Login</h2>
+      <h2 className='heading'>LOGIN</h2>
       <input
         type="email"
         placeholder="Email"

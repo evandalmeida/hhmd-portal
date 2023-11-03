@@ -8,6 +8,7 @@ import App from "./components/App";
 import ClinicRegistration from "./components/Main/UserPanel/Clinic/ClinicRegistration"; 
 import PatientRegistration from "./components/Main/UserPanel/Patient/PatientRegistration";
 import ClinicDashboard from "./components/Main/UserPanel/Clinic/ClinicDash";
+import ProviderForm from "./components/Main/UserPanel/Clinic/ProviderForm";
 import PatientDashboard from "./components/Main/UserPanel/Patient/PatientDash";
 import Login from "./components/Main/UserPanel/Login";
 import LandingPage from "./components/Main/LandingPage"
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
                 path: '/patient-dashboard',
                 element: <PatientDashboard/>,
             },
+            {
+                path: '/providers/new',
+                element: <ProviderForm/>,
+            }
         ]
     }
 ])

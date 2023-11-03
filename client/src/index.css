@@ -1,4 +1,18 @@
 /* Logo and Header */
+
+head, body {
+  font-family: 'Helvetica', sans-serif;
+}
+
+
+
+.content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+
 #head {
   display: flex;
   justify-content: center;
@@ -19,11 +33,13 @@
 @media (max-width: 768px) {
   #logo {
     aspect-ratio: 1 / 1;
-    width: 5vh;
+    width: 15vh;
     height: auto;
-    max-width: 5vh;
-    max-height: 5vh;
+    max-height: 15vh;
     justify-self: center;
+  }
+  #title {
+    font-size: 3rem;
   }
 }
 
@@ -39,19 +55,87 @@
   display: flex;
   width: 100vw;
   flex-direction: column;
-  background-color: #F3F3F3;
-  font-family: 'Roboto', sans-serif;
+  background-color: white;
   align-items: center; 
   justify-content: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  background-color: #F3F3F3;
+  margin: auto;
+  width: 23vw;
+  height: auto;
+  padding: 5vh;
+  border: 3px solid black;
+  border-radius: 10px 100px / 120px 100px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  gap: 2vh;
+  align-items: center;
+}
+
+.form form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30vw;
+  height: auto;
+
+}
+
+.form input {
+  border-radius: 10px;
+  height: 4vh;
+  width: 70%;
+  border: 1px solid black;
+  padding: 0.3rem;
+  padding-left: 20px;
+  align-items: baseline;
+  margin-top: 10px;
+}
+
+.form input::placeholder {
+  color: black;
+  align-items: center;
+  font-weight:400;
+}
+
+/* Form Button */
+.form button {
+  width: auto;
+  max-width: 70%;
+  background-color: #1AA18F;
+  color: #fff;
+  padding: 1rem;
+  margin: auto;
+  margin-top: 3vh;
+  cursor: pointer;
+  border: 2px solid black;
+  box-shadow: 0 4px 8px #00000066;
+  border-radius: 10px 100px / 120px 100px;
+  transition: background-color 0.3s, color 0.3s;
+  font-size: larger;
+  font-weight:400;
+}
+
+.form button:hover {
+ background-color: #fff;
+ color: #1AA1AF;
+}
+
+.form p {
+  text-align: center;
+  font-size: smaller;
 }
 
 /* Heading */
 .heading {
   text-align: center;
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-top: 1.5rem;
-  font-family: 'Roboto', sans-serif;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
 }
 
 /* User Control and Clinic Dash */
@@ -76,7 +160,7 @@
   align-items: center; 
   height: auto;
   width: 100%;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .user_control {
@@ -87,19 +171,31 @@
 }
 
 .clinic_dash h2 {
-  text-align: left;
+  text-align: center;
   font-size: 1.5rem;
   padding: 1vw;
-  width: 30%;
-  height: 100%;
+  width: 40%;
+  height: auto;
   background-color: #1AA18F;
   color: white;
   border-radius: 10px 100px / 120px 100px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid black;
+  box-shadow: 1px 4px 15px 8px rgba(0, 0, 0, 0.2);
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0px 0px 9px 5px rgba(255, 255, 255, 0.3);
+}
+
+
+.clinic_dash h2:hover {
+  box-shadow: inset 0px 0px 9px 5px rgba(26, 161, 143, 0.3);
+  box-shadow: 1px 4px 15px 8px rgba(26, 161, 143, 0.6);
 }
 
 /* User Information and Logout */
 .user {
+  margin: auto;
+  margin-bottom: 5px;
+  margin-top: 5px;
   text-align: center;
   width: 20vw;
   text-transform: uppercase; 
@@ -109,12 +205,16 @@
 }
 
 .logout {
-  width: 100%;
+  width: auto;
+  max-width: 80%;
   height: auto;
-  color: black;
+  color: rgb(255, 0, 0);
   background-color: transparent;
   text-align: center;
+  border: none;
   border-radius: 10px 100px / 120px 100px;
+  margin: auto;
+  padding: 10px 20px;
 }
 
 .logout:hover {
@@ -126,8 +226,23 @@
 
 /* Clinic Info, Providers, and Patients */
 .clinic-info {
-  text-align: left;
+  background-color: #efefef;
+  margin: auto;
+  margin-top: 1vh;
+  margin-bottom: 5vh;
+  width: 70%;
+  border: none;
+  border-radius: 10px 100px / 120px 100px;
+  box-shadow: 1px 4px 15px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0px 0px 15px 8px rgba(255, 255, 255, 0.764);
 }
+
+.clinic-info p {
+  padding: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
 
 .clinic_patient_dash,
 .clinic_provider_dash,
@@ -136,16 +251,38 @@
   flex-direction: column; 
   align-items: center; 
   justify-content: center;
-  padding: 20px;
+  position: relative;
+  padding: 10px;
   width: 70vw;
   height: auto;
-  margin: 20px auto; 
+  margin: auto; 
+  overflow: hidden; 
+}
+
+
+.clinic_provider_dash {
+  display: flex;
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center;
+  position: relative;
+  padding: 10px;
+  width: 70vw;
+  height: auto;
+  max-height: 60vh;
+  margin: auto; 
+}
+
+
+
+.clinic_patient_dash {
+position: relative; /* Add relative positioning */
+z-index: 2;
 }
 
 /* Additional styles for header h2 elements inside the components */
 .clinic_patient_dash h2,
-.clinic_provider_dash h2,
-.clinic_dash h2 {
+.clinic_provider_dash h2{
   text-align: center;
   font-size: 1.5rem;
   padding: 1vw;
@@ -154,7 +291,17 @@
   color: white;
   border-radius: 10px 100px / 120px 100px;
   margin: 3vh;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid black;
+  box-shadow: 1px 4px 15px 8px rgba(0, 0, 0, 0.2);
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0px 0px 9px 5px rgba(255, 255, 255, 0.3);
+}
+
+
+.clinic_patient_dash h2:hover,
+.clinic_provider_dash h2:hover{
+  box-shadow: inset 0px 0px 9px 5px rgba(26, 161, 143, 0.3);
+  box-shadow: 1px 4px 15px 8px rgba(26, 161, 143, 0.6);
 }
 
 /* Additional styles for content inside the components */
@@ -185,8 +332,11 @@
 /* Styles for the expanded content */
 .providers ,
 .patients  {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
   max-height: 30vh; 
-  transition: max-height 1s; 
 }
 
 .patients {
@@ -262,6 +412,7 @@
   flex-direction: column;
 }
 
+
 .homebutton {
   background-color: #1AA18F;
   color: #fff;
@@ -274,8 +425,9 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   margin: 0.7rem auto;
   font-size: 1.2rem;
-  font-family: 'Roboto', sans-serif;
+
   text-align: center;
+  font-weight: 500;
 }
 
 .homebutton:hover {
@@ -283,8 +435,213 @@
   color: #1AA1AF;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 844px) {
   .homebutton {
-    font-size: 2rem;
+    font-size: larger;
+    padding: 10px;
   }
+}
+
+a {
+  text-decoration: none;
+  font-weight: bold;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  margin: 5vh auto;
+  align-items: center;
+}
+
+footer {
+  width: auto;
+  max-width: 30vw;
+  height: auto;
+  max-height: 20vh;
+  margin: auto;
+  margin-bottom: 5vh;
+  margin-top: 10vh;
+  position: flex-end;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 0 1rem 0 rgba(0, 0, 0, .2);
+  background-color: rgba(255, 255, 255, .15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px 100px / 120px 100px;
+}
+
+
+footer img {
+  width: 20%;
+  margin: auto;
+}
+
+
+@media (max-width: 844px) {
+  footer {
+    width: auto;
+    max-width: 40vw;
+    height: auto;
+    max-height: 40vh;
+  }
+}
+
+
+
+.provider-form {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  margin-left: 28vw;
+  width:  50vw;
+}
+
+
+.provider-form select {
+  border-radius: 10px;
+  height: auto;
+  width: 60%;
+  border: 1px solid black;
+  padding: 0.3rem;
+  padding-left: 10px;
+  margin-left: 3.2vw;
+  margin-bottom: 10px;
+  align-items: baseline;
+}
+
+.provider-form input {
+  border-radius: 10px;
+  height: auto;
+  width: 60%;
+  border: 1px solid black;
+  padding: 0.3rem;
+  padding-left: 20px;
+  margin-left: 2vw;
+  margin-bottom: 10px;
+  align-items: baseline;
+}
+
+.provider-form input::placeholder,
+.provider-form select::placeholder {
+  color: black;
+  align-items: center;
+  font-weight:400;
+}
+
+
+
+.provider-form button {
+  width: auto;
+  max-width: 30%;
+  background-color: #1AA18F;
+  color: #fff;
+  padding: 1rem;
+  margin-top: 3vh;
+  margin-left: 11vw;
+  cursor: pointer;
+  border: 2px solid black;
+  box-shadow: 0 4px 8px #00000066;
+  border-radius: 10px 100px / 120px 100px;
+  transition: background-color 0.3s, color 0.3s;
+  font-size: medium;
+  font-weight:400;
+  align-items: center;
+}
+
+.provider-form button:hover {
+ background-color: #fff;
+ color: #1AA1AF;
+}
+
+.provider {
+  margin-bottom: 5px;
+  margin-top: 5px;
+  margin-left:5vw;
+  text-align: center;
+  width: 50vw;
+  text-transform: uppercase; 
+  color: #1AA18F;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 3em;
+}
+
+.provider-panel {
+  width: 70vw;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: auto;
+
+}
+
+.provider-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.provider-add-button {
+  max-width: 80%;
+  width: auto;
+  height: auto;
+  color: black;
+  background-color: transparent;
+  text-align: center;
+  border-radius: 20px;
+  padding: 10px;
+  font-size: large;
+}
+
+.provider-add-button:hover {
+  background-color: rgba(0, 255, 0, 0.503);
+  color: black;
+  border: 1px solid white;
+  box-shadow: 0 4px 8px rgba(0, 255, 0, 0.503);
+}
+
+
+.home {
+  max-width: 80%;
+  width: auto;
+  height: auto;
+  color: black;
+  padding: 10px 20px;
+  padding-right: 40px;
+  background-color: transparent;
+  text-align: center;
+  border-radius: 10px 100px / 120px 100px;
+  margin: auto;
+
+}
+
+.home:hover {
+  background-color: rgb(11, 158, 11);;
+  color: white;
+  border: 1px solid white;
+  box-shadow: 0 4px 8px rgb(11, 158, 11);
+}
+
+
+
+
+.delete-button {
+  width: auto;
+  max-width: 80%;
+  height: auto;
+  color: black;
+  background-color: transparent;
+  text-align: center;
+  border: none;
+  margin: auto;
+}
+
+.delete-button:hover {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 30%;
+  box-shadow: 0 4px 8px rgb(255, 0, 0);
 }
