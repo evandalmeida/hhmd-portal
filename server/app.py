@@ -2,6 +2,7 @@ from models import User, Clinic, Patient, Appointment, Provider
 from flask import request, jsonify
 from config import app, db, bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
+from werkzeug.security import generate_password_hash
 
 
 URL = '/api/v1'
@@ -48,47 +49,49 @@ def logout():
 
 
 # CLINIC 
-# @app.post(URL + '/clinic_admin-registration')
-# def clinic_register():
-#     data = request.get_json()
+@app.post('/clinic_admin-registration')
+def clinic_register():
+    data = request.get_json()
 
-#     username = data.get('username')
-#     email = data.get('email')
-#     password = data.get('password')  
-#     clinic_name = data.get('clinic_name')
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')  
+    clinic_name = data.get('clinic_name')
 
-#     if not all([username, password, email, clinic_name]):
-#         return jsonify({'error': 'All fields are required'}), 400
+    if not all([username, password, email, clinic_name]):
+        return jsonify({'error': 'All fields are required'}), 400
 
-#     existing_user = User.query.filter_by(email=email).first()
-#     if existing_user:
-#         return jsonify({'error': 'User with this email already exists'}), 409
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({'error': 'User with this email already exists'}), 409
 
-#     password_hash = bcrypt.generate_password_hash(password.encode('utf-8'), 10)
+    # Hash the password
+    password_hash = generate_password_hash(password)
 
-#     new_user = User(
-#         username=username,
-#         email=email,
-#         password_hash=password_hash.decode('utf-8'),  
-#         role='clinic_admin'
-#     )
+    # Create a new User instance
+    new_user = User(
+        username=username,
+        email=email,
+        password_hash=password_hash,
+        role='clinic_admin'
+    )
 
-#     new_clinic = Clinic(
-#         name=clinic_name,
-#         user=new_user,
-#         address=data.get('clinic_address'),
-#         state=data.get('clinic_state'),
-#         zip_code=data.get('clinic_zip_code'),
-#     )
+    # Create a new Clinic instance
+    new_clinic = Clinic(
+        name=clinic_name,
+        user=new_user,
+        address=data.get('clinic_address'),
+        state=data.get('clinic_state'),
+        zip_code=data.get('clinic_zip_code'),
+    )
 
-#     db.session.add(new_user)
-#     db.session.add(new_clinic)
-#     db.session.commit()
+    # Add the new User and Clinic to the database
+    db.session.add(new_user)
+    db.session.add(new_clinic)
+    db.session.commit()
     
-#     session['user_id'] = new_user.id
-
-#     return jsonify(new_user.to_dict()), 201
-
+    # Return a success message without issuing JWT tokens
+    return jsonify({"msg": "Clinic admin registered successfully. Please log in."}), 201
 
 
 
