@@ -1,8 +1,30 @@
 from models import User, Clinic, Patient, Appointment, Provider
 from flask import request, jsonify
 from config import app, db, bcrypt
+from flask_jwt_extended import create_access_token
+
+
 
 URL = '/api/v1'
+
+#LOGIN/LOGOUT
+@app.post(URL + '/login')
+def logn():
+   data = request.json
+   user = User.query.filter_by(email=data['email']).first()
+
+   if user and bcrypt.check_password_hash(user.password_hash, data['password']):
+      access_token = create_access_token(identity=user.id)
+      return jsonify(access_token=access_token), 200
+   else:
+      return jsonify({"message":"Invalid username or password"})
+
+@app.delete(URL + '/logout')
+def logout():
+    session['user_id'] = None
+    return {}, 204
+
+
 
 
 # CLINIC 
@@ -48,30 +70,7 @@ def clinic_register():
     return jsonify(new_user.to_dict()), 201
 
 
-#LOGIN/LOGOUT and CHECK SESSION
-@app.post(URL + '/login')
-def login():
-    data = request.json
-    user = User.query.filter_by(email=data['email']).first()
 
-    if user and bcrypt.check_password_hash(user.password_hash, data['password']):
-        session['user_id'] = user.id
-        return jsonify(user.to_dict()), 202
-    else:
-        return jsonify({"message": "Invalid username or password"}), 401
-    
-@app.get(URL + '/check_session')
-def check_session():
-    user = current_user()
-    if user:
-        return jsonify({'user_id': user.id, 'role': user.role}), 200
-    else: 
-        return {}, 401
-    
-@app.delete(URL + '/logout')
-def logout():
-    session['user_id'] = None
-    return {}, 204
 
 
 # PATIENT
