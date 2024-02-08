@@ -28,7 +28,7 @@ def login():
         resp = jsonify(access_token=access_token)
         
         # Set the refresh token in an HttpOnly cookie
-        resp.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Strict')
+        resp.set_cookie('refresh_token', refresh_token, httponly=True, samesite='Strict') #add secure=True after dev
         
         return resp, 200
     else:
@@ -36,12 +36,12 @@ def login():
 
 @app.delete('/logout')
 def logout():
-    
+
     # Create a response object
     resp = jsonify({"msg": "Logout successful"})
     
     # Set the refresh token cookie to empty, effectively removing it
-    resp.set_cookie('refresh_token', '', httponly=True, secure=True, samesite='Strict', max_age=0)
+    resp.set_cookie('refresh_token', '', httponly=True, samesite='Strict', max_age=0) #add secure=True after dev
     
     return resp, 200
 
