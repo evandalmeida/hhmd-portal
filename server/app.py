@@ -1,15 +1,15 @@
 from models import User, Clinic, Patient, Appointment, Provider
-from flask import request, jsonify, session
+from flask import request, jsonify
 from config import app, db, bcrypt
 
 app.secret_key = b'u\xd2\xdc\xe82\xa3\xc0\xca\xe7H\xd03oi\xd1\x95\xcc\x7f'
 
 URL = '/api/v1'
 
-# HELPER METHODS
-def current_user():
-    print(f"\nuser id: {session.get('user_id')}\n")
-    return User.query.filter(User.id == session.get('user_id')).first()
+# # HELPER METHODS
+# def current_user():
+#     print(f"\nuser id: {session.get('user_id')}\n")
+#     return User.query.filter(User.id == session.get('user_id')).first()
 
 # CLINIC 
 @app.post(URL + '/clinic_admin-registration')
@@ -249,5 +249,3 @@ def add_provider():
 if __name__ == '__main__':
     db.create_all() 
     app.run(port=5555, debug=True)
-
-

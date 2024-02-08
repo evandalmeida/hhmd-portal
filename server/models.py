@@ -130,5 +130,3 @@ patient_clinics = db.Table('patient_clinics',
     db.Column('patient_id', db.Integer, db.ForeignKey('patients.id'), primary_key=True),
     db.Column('clinic_id', db.Integer, db.ForeignKey('clinics.id'), primary_key=True)
 )
-
-
