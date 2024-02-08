@@ -34,6 +34,16 @@ def login():
     else:
         return jsonify({"msg": "Bad username or password"}), 401
 
+@app.delete('/logout')
+def logout():
+    
+    # Create a response object
+    resp = jsonify({"msg": "Logout successful"})
+    
+    # Set the refresh token cookie to empty, effectively removing it
+    resp.set_cookie('refresh_token', '', httponly=True, secure=True, samesite='Strict', max_age=0)
+    
+    return resp, 200
 
 
 
