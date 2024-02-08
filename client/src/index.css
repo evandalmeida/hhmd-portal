@@ -25,19 +25,6 @@ head, body {
   justify-self: center;
 }
 
-@media (max-width: 768px) {
-  #logo {
-    aspect-ratio: 1 / 1;
-    width: 15vh;
-    height: auto;
-    max-height: 15vh;
-    justify-self: center;
-  }
-  #title {
-    font-size: 3rem;
-  }
-}
-
 #title {
   display: flex;
   font-size: 4rem;
@@ -412,6 +399,23 @@ z-index: 2;
     font-size: larger;
     padding: 10px;
   }
+  #logo {
+    aspect-ratio: 1 / 1;
+    width: 15vh;
+    height: auto;
+    max-height: 15vh;
+    justify-self: center;
+  }
+  #title {
+    font-size: 3rem;
+  }
+
+  .footer {
+    width: auto;
+    max-width: 40vw;
+    height: auto;
+    max-height: 40vh;
+  }
 }
 
 a {
@@ -424,7 +428,7 @@ a {
   align-items: center;
 }
 
-footer {
+.footer {
   width: auto;
   max-width: 30vw;
   height: auto;
@@ -444,22 +448,10 @@ footer {
   border-radius: 10px 100px / 120px 100px;
 }
 
-
-footer img {
+.footer img {
   width: 20%;
   margin: auto;
 }
-
-
-@media (max-width: 844px) {
-  footer {
-    width: auto;
-    max-width: 40vw;
-    height: auto;
-    max-height: 40vh;
-  }
-}
-
 
 .provider-form {
   display: flex;
@@ -468,7 +460,6 @@ footer img {
   margin-left: 28vw;
   width:  50vw;
 }
-
 
 .provider-form select {
   border-radius: 10px;
