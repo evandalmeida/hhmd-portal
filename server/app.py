@@ -4,8 +4,9 @@ from config import app, db, bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
 from werkzeug.security import generate_password_hash
 
-
 URL = '/api/v1'
+
+
 
 #LOGIN/LOGOUT
 @app.post('/login')
@@ -34,6 +35,7 @@ def login():
         return resp, 200
     else:
         return jsonify({"msg": "Bad username or password"}), 401
+
 
 @app.delete('/logout')
 def logout():
@@ -96,59 +98,59 @@ def clinic_register():
 
 
 
-# # PATIENT
-# @app.post(URL + '/patient-registration')
-# def patient_register():
-#     # Get the registration data from the request
-#     data = request.get_json()
+# PATIENT
+@app.post(URL + '/patient-registration')
+def patient_register():
+    # Get the registration data from the request
+    data = request.get_json()
 
-#     # Extract the required fields from the request data
-#     first_name = data.get('first_name')
-#     last_name = data.get('last_name')
-#     dob = data.get('dob')
-#     street_address = data.get('street_address')
-#     state = data.get('state')
-#     zip_code = data.get('zip_code')
-#     username = data.get('username')
-#     email = data.get('email')
-#     password = data.get('password')
+    # Extract the required fields from the request data
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    dob = data.get('dob')
+    street_address = data.get('street_address')
+    state = data.get('state')
+    zip_code = data.get('zip_code')
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
 
-#     # Check if all required fields are provided
-#     if not all([first_name, last_name, dob, street_address, state, zip_code, username, email, password]):
-#         return jsonify({'error': 'All fields are required'}), 400
+    # Check if all required fields are provided
+    if not all([first_name, last_name, dob, street_address, state, zip_code, username, email, password]):
+        return jsonify({'error': 'All fields are required'}), 400
 
-#     # Check if a user with the same email already exists
-#     existing_user = User.query.filter_by(email=email).first()
-#     if existing_user:
-#         return jsonify({'error': 'User with this email already exists'}), 409
+    # Check if a user with the same email already exists
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({'error': 'User with this email already exists'}), 409
 
-#     # Hash the password
-#     password_hash = bcrypt.generate_password_hash(password.encode('utf-8'), 10)
+    # Hash the password
+    password_hash = bcrypt.generate_password_hash(password.encode('utf-8'), 10)
 
-#     # Create a new User and Patient
-#     new_user = User(
-#         username=username,
-#         email=email,
-#         password_hash=password_hash.decode('utf-8'),
-#         role='patient'
-#     )
+    # Create a new User and Patient
+    new_user = User(
+        username=username,
+        email=email,
+        password_hash=password_hash.decode('utf-8'),
+        role='patient'
+    )
 
-#     new_patient = Patient(
-#         first_name=first_name,
-#         last_name=last_name,
-#         dob=dob,
-#         street_address=street_address,
-#         state=state,
-#         zip_code=zip_code,
-#         user=new_user
-#     )
+    new_patient = Patient(
+        first_name=first_name,
+        last_name=last_name,
+        dob=dob,
+        street_address=street_address,
+        state=state,
+        zip_code=zip_code,
+        user=new_user
+    )
 
-#     # Add the new User and Patient to the database
-#     db.session.add(new_user)
-#     db.session.add(new_patient)
-#     db.session.commit()
+    # Add the new User and Patient to the database
+    db.session.add(new_user)
+    db.session.add(new_patient)
+    db.session.commit()
 
-#     return jsonify(new_user.to_dict()), 201
+    return jsonify(new_user.to_dict()), 201
 
 # # CLINIC INFO
 # @app.route(URL + '/clinic_info')
