@@ -1,7 +1,7 @@
 from models import User, Clinic, Patient, Appointment, Provider
 from flask import request, jsonify
 from config import app, db, bcrypt
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash
 
 URL = '/api/v1'
@@ -153,18 +153,26 @@ def patient_register():
     return jsonify(new_user.to_dict()), 201
 
 # # CLINIC INFO
-# @app.route(URL + '/clinic_info')
-# def clinic_info():
-#   if current_user().role == 'clinic_admin':
-#     clinic = current_user().clinic
-
-#     if not clinic:
-#       return jsonify({'error': 'Information not found'}), 404
+@app.route(URL + '/clinic_info')
+@jwt_required()
+def clinic_info():
+    # Get the identity of the current user from the JWT token
+    current_user_id = get_jwt_identity()
     
-#     return jsonify(clinic.to_dict())
+    # Fetch the user based on the identity
+    user = User.query.get(current_user_id)
 
-#   else:
-#     return jsonify({'error': 'Unauthorized'}), 401
+    # Check if the user exists and has the role 'clinic_admin'
+    if user and user.role == 'clinic_admin':
+        clinic = user.clinic
+
+        if not clinic:
+            return jsonify({'error': 'Information not found'}), 404
+
+        return jsonify(clinic.to_dict())
+
+    else:
+        return jsonify({'error': 'Unauthorized'}), 401
   
 
 # # GET PATIENTS
