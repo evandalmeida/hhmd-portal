@@ -200,17 +200,23 @@ def get_patients():
 
 
 # # PROVIDERS FOR CLINICS
-# @app.route(URL + '/providers')
-# def get_appointments():
-#     if current_user().role == 'clinic_admin':
+@app.route(URL + '/providers')
+@jwt_required()
+def get_appointments():
+    # Get the identity of the current user from the JWT token
+    current_user_id = get_jwt_identity()
 
-#         providers = Provider.query.filter_by(clinic_id=current_user().clinic.id)
-    
-#         return jsonify([provider.to_dict() for provider in providers])
+    # Fetch the user based on the identity
+    user = User.query.get(current_user_id)
 
+    # Check if the user exists and has the role 'clinic_admin'
+    if user and user.role == 'clinic_admin':
+        providers = Provider.query.filter_by(clinic_id=user.clinic.id)
 
-#     else:
-#         return jsonify({'error': 'Unauthorized'}), 401
+        return jsonify([provider.to_dict() for provider in providers])
+
+    else:
+        return jsonify({'error': 'Unauthorized'}), 401
 
 
 
