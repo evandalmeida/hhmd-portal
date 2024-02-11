@@ -221,19 +221,28 @@ def get_appointments():
 
 
 # # Delete a patient
-# @app.delete(URL + '/patients/<int:patient_id>')  
-# def delete_patient(patient_id):
-#   if current_user().role != 'clinic_admin':
-#     return jsonify({'error': 'Unauthorized'}), 401
-  
-#   patient = Patient.query.get(patient_id)
-#   if not patient:
-#     return jsonify({'error': 'Patient not found'}), 404
+@app.delete(URL + '/patients/<int:patient_id>')
+@jwt_required()
+def delete_patient(patient_id):
+    # Get the identity of the current user from the JWT token
+    current_user_id = get_jwt_identity()
 
-#   db.session.delete(patient)
-#   db.session.commit()
+    # Fetch the user based on the identity
+    user = User.query.get(current_user_id)
 
-#   return {}, 204
+    # Check if the user has the role 'clinic_admin'
+    if user.role != 'clinic_admin':
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    patient = Patient.query.get(patient_id)
+    if not patient:
+        return jsonify({'error': 'Patient not found'}), 404
+
+    db.session.delete(patient)
+    db.session.commit()
+
+    return {}, 204
+
 
 # # Delete a provider  
 # @app.delete(URL + '/providers/<int:provider_id>')
