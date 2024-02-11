@@ -176,18 +176,26 @@ def clinic_info():
   
 
 # # GET PATIENTS
-# @app.route(URL + '/patients')
-# def get_patients():
-#     if current_user().role == 'clinic_admin':
-#         clinic = Clinic.query.get(current_user().clinic.id)
-#         if not clinic:
-#             return jsonify({'error': 'Clinic not found'}), 404
-#         patients = clinic.patients
+@app.route(URL + '/patients')
+@jwt_required()
+def get_patients():
+    # Get the identity of the current user from the JWT token
+    current_user_id = get_jwt_identity()
 
-#         return jsonify([patient.to_dict() for patient in patients ])
+    # Fetch the user based on the identity
+    user = User.query.get(current_user_id)
 
-#     else:
-#         return jsonify({'error': 'Unauthorized'}), 401
+    # Check if the user exists and has the role 'clinic_admin'
+    if user and user.role == 'clinic_admin':
+        clinic = Clinic.query.get(user.clinic.id)
+        if not clinic:
+            return jsonify({'error': 'Clinic not found'}), 404
+        patients = clinic.patients
+
+        return jsonify([patient.to_dict() for patient in patients])
+
+    else:
+        return jsonify({'error': 'Unauthorized'}), 401
 
 
 
