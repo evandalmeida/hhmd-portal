@@ -245,53 +245,53 @@ def delete_patient(patient_id):
 
 
 # # Delete a provider  
-# @app.delete(URL + '/providers/<int:provider_id>')
-# def delete_provider(provider_id):
-#   if current_user().role != 'clinic_admin':
-#     return jsonify({'error': 'Unauthorized'}), 401
+@app.delete(URL + '/providers/<int:provider_id>')
+def delete_provider(provider_id):
+  if current_user().role != 'clinic_admin':
+    return jsonify({'error': 'Unauthorized'}), 401
 
-#   provider = Provider.query.get(provider_id)
-#   if not provider:
-#     return jsonify({'error': 'Provider not found'}), 404
+  provider = Provider.query.get(provider_id)
+  if not provider:
+    return jsonify({'error': 'Provider not found'}), 404
   
-#   db.session.delete(provider)
-#   db.session.commit()
+  db.session.delete(provider)
+  db.session.commit()
 
-#   return {}, 204
-# @app.post('/new_providers')
-# def add_provider():
+  return {}, 204
+@app.post('/new_providers')
+def add_provider():
 
-#   print("/new_providers endpoint reached")
+  print("/new_providers endpoint reached")
 
-#   data = request.get_json()
+  data = request.get_json()
 
-#   print("Request data:", data)
+  print("Request data:", data)
 
-#   first_name = data.get('first_name')
-#   last_name = data.get('last_name')
-#   provider_type = data.get('provider_type')
+  first_name = data.get('first_name')
+  last_name = data.get('last_name')
+  provider_type = data.get('provider_type')
 
-#   if not all([first_name, last_name, provider_type]):
-#       print("/new_providers: Missing required fields")
-#       return jsonify({'error': 'All fields are required'}), 400
+  if not all([first_name, last_name, provider_type]):
+      print("/new_providers: Missing required fields")
+      return jsonify({'error': 'All fields are required'}), 400
 
-#   print("/new_providers: Creating new provider...")
+  print("/new_providers: Creating new provider...")
 
-#   new_provider = Provider(
-#       first_name=data['first_name'], 
-#       last_name=data['last_name'],
-#       provider_type=data['provider_type'],
-#       clinic_id=current_user().clinic.id
-#   )
+  new_provider = Provider(
+      first_name=data['first_name'], 
+      last_name=data['last_name'],
+      provider_type=data['provider_type'],
+      clinic_id=current_user().clinic.id
+  )
 
-#   print("/new_providers: Saving new provider...")
+  print("/new_providers: Saving new provider...")
   
-#   db.session.add(new_provider)
-#   db.session.commit()
+  db.session.add(new_provider)
+  db.session.commit()
 
-#   print("/new_providers: Provider created!")
+  print("/new_providers: Provider created!")
 
-#   return jsonify(new_provider.to_dict()), 201
+  return jsonify(new_provider.to_dict()), 201
 
 
 
